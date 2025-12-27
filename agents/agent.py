@@ -10,7 +10,16 @@ class Agent:
     def position(self):
         return (self.x, self.y)
 
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
-        self.status = "MOVING"
+    def move(self, dx, dy, grid):
+        new_x = self.x + dx
+        new_y = self.y + dy
+
+        if 0 <= new_x < grid.width and 0 <= new_y < grid.height:
+            if grid.is_free(new_x, new_y):
+                self.x = new_x
+                self.y = new_y
+                self.status = "MOVING"
+                return True
+
+        self.status = "BLOCKED"
+        return False
