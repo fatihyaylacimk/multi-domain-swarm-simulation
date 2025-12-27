@@ -1,11 +1,23 @@
-class GridMap:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.grid = [[0 for _ in range(width)] for _ in range(height)]
+    def render(self, agents=None, goal=None):
+        view = [[ "." for _ in range(self.width)] for _ in range(self.height)]
 
-    def add_obstacle(self, x, y):
-        self.grid[y][x] = 1
+        # engeller
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.grid[y][x] == 1:
+                    view[y][x] = "#"
 
-    def is_free(self, x, y):
-        return self.grid[y][x] == 0
+        # hedef
+        if goal:
+            gx, gy = goal
+            view[gy][gx] = "G"
+
+        # agentlar
+        if agents:
+            for a in agents:
+                x, y = a.position()
+                view[y][x] = "A" if a.agent_type == "LAND" else "H"
+
+        for row in view:
+            print(" ".join(row))
+        print()
