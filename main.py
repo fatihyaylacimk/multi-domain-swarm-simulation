@@ -1,5 +1,6 @@
 from agents.agent import Agent
 from environment.map import GridMap
+from algorithms.bfs import bfs
 
 if __name__ == "__main__":
     grid = GridMap(width=5, height=5)
@@ -13,14 +14,14 @@ if __name__ == "__main__":
         speed=1
     )
 
-    print("Start:", agent1.position())
+    start = agent1.position()
+    goal = (4, 4)
 
-    moved = agent1.move(1, 0, grid)
-    print("Move right:", moved, "Position:", agent1.position())
+    path = bfs(grid, start, goal)
+    print("Path:", path)
 
-    moved = agent1.move(1, 0, grid)
-    print("Move right:", moved, "Position:", agent1.position())
-
-    moved = agent1.move(0, 1, grid)
-    print("Move down:", moved, "Position:", agent1.position())
-
+    for step in path[1:]:
+        dx = step[0] - agent1.x
+        dy = step[1] - agent1.y
+        agent1.move(dx, dy, grid)
+        print("Moved to:", agent1.position())
