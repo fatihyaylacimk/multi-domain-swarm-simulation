@@ -1,4 +1,4 @@
-    from agents.agent import Agent
+from agents.agent import Agent
 from agents.air_agent import AirAgent
 from environment.map import GridMap
 from algorithms.bfs import bfs
@@ -32,10 +32,12 @@ if __name__ == "__main__":
 
     occupied = set()
 
+    print("=== SIMULATION START ===")
+
     # LAND agentlar BFS ile gider
     for agent in land_agents:
         path = bfs(grid, agent.position(), goal)
-        print(f"LAND {agent.agent_id} path:", path)
+        print(f"\nLAND {agent.agent_id} path:", path)
 
         for step in path[1:]:
             dx = step[0] - agent.x
@@ -56,4 +58,10 @@ if __name__ == "__main__":
 
     # AIR agent direkt hedefe gider
     air_agent.move(goal[0] - air_agent.x, goal[1] - air_agent.y, grid)
-    print("AIR final:", air_agent.position())
+    print("\nAIR final:", air_agent.position())
+
+    # FINAL HARİTA GÖRÜNÜMÜ
+    print("\nFINAL MAP VIEW:")
+    grid.render(agents=land_agents + [air_agent], goal=goal)
+
+    print("=== SIMULATION END ===")
