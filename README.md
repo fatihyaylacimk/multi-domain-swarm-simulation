@@ -1,4 +1,10 @@
-# Multi-Domain Swarm Simulation System
+## Swarm Simulation Output
+
+![Swarm Simulation](swarm_simulation.png)
+
+    
+    
+    # Multi-Domain Swarm Simulation System
 
 This repository contains a simulation-based software project that models
 swarm behavior for land and aerial agents in a controlled, academic environment.
