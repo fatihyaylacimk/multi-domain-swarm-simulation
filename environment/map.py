@@ -7,10 +7,6 @@ class GridMap:
         self.height = height
         self.obstacles = obstacles if obstacles else []
 
-        # GUI için tek pencere kullanacağız
-        plt.ion()
-        self.fig, self.ax = plt.subplots(figsize=(6, 6))
-
     def in_bounds(self, x, y):
         return 0 <= x < self.width and 0 <= y < self.height
 
@@ -20,39 +16,57 @@ class GridMap:
     def neighbors(self, x, y):
         directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         result = []
-
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
             if self.in_bounds(nx, ny) and self.is_free(nx, ny):
                 result.append((nx, ny))
-
         return result
+
+    def render(self, agents=None, goal=None):
+        agents = agents if agents else []
+        for y in range(self.height):
+            row = ""
+            for x in range(self.width):
+                if (x, y) in self.obstacles:
+                    row += "# "
+                elif goal and (x, y) == goal:
+                    row += "G "
+                elif any(a.x == x and a.y == y for a in agents):
+                    row += "A "
+                else:
+                    row += ". "
+            print(row)
 
     def render_gui(self, agents=None, goal=None):
         agents = agents if agents else []
 
-        self.ax.clear()
-        self.ax.set_title("Multi-Domain Swarm Simulation")
+        plt.figure(figsize=(6, 6))
 
-        # Grid ayarları
-        self.ax.set_xlim(-0.5, self.width - 0.5)
-        self.ax.set_ylim(-0.5, self.height - 0.5)
-        self.ax.set_xticks(range(self.width))
-        self.ax.set_yticks(range(self.height))
-        self.ax.grid(True)
-        self.ax.invert_yaxis()
+        # Draw grid
+        for x in range(self.width + 1):
+            plt.plot([x, x], [0, self.height], color="gray", linewidth=0.5)
+        for y in range(self.height + 1):
+            plt.plot([0, self.width], [y, y], color="gray", linewidth=0.5)
 
         # Obstacles
         for (x, y) in self.obstacles:
-            self.ax.scatter(x, y, c="black", s=300)
+            plt.fill_between([x, x + 1], y, y + 1, color="black")
 
         # Goal
         if goal:
-            self.ax.scatter(goal[0], goal[1], c="green", s=300, marker="*")
+            gx, gy = goal
+            plt.scatter(gx + 0.5, gy + 0.5, c="green", s=200, label="Goal")
 
         # Agents
-        for agent in agents:
-            self.ax.scatter(agent.x, agent.y, c="blue", s=150)
-            self.ax.text(agent.x + 0.1, agent.y + 0.1, agent.name, fontsize=8)
+        for a in agents:
+            plt.scatter(a.x + 0.5, a.y + 0.5, s=150, label=a.name)
 
-        plt.pause(0.3)
+        plt.xlim(0, self.width)
+        plt.ylim(0, self.height)
+        plt.gca().set_aspect("equal")
+        plt.title("Multi-Domain Swarm Simulation")
+        plt.legend()
+        plt.grid(True)
+
+        # 🔥 BU SATIR KRİTİK
+        plt.show(block=True)
