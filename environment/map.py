@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 class GridMap:
     def __init__(self, width, height, obstacles=None):
         self.width = width
@@ -11,7 +14,7 @@ class GridMap:
         return (x, y) not in self.obstacles
 
     def neighbors(self, x, y):
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        directions = [(1,0), (-1,0), (0,1), (0,-1)]
         result = []
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
@@ -19,19 +22,24 @@ class GridMap:
                 result.append((nx, ny))
         return result
 
-    def render(self, agents=None, goal=None):
-        agents = agents if agents else []
+    def render_visual(self, agents=None, goal=None):
+        grid = np.zeros((self.height, self.width))
 
-        print("\nFINAL MAP VIEW:")
-        for y in range(self.height):
-            row = ""
-            for x in range(self.width):
-                if (x, y) in self.obstacles:
-                    row += "# "
-                elif goal and (x, y) == goal:
-                    row += "G "
-                elif any(a.x == x and a.y == y for a in agents):
-                    row += "A "
-                else:
-                    row += ". "
-            print(row)
+        for (x, y) in self.obstacles:
+            grid[y][x] = -1
+
+        if agents:
+            for a in agents:
+                grid[a.y][a.x] = 2
+
+        if goal:
+            gx, gy = goal
+            grid[gy][gx] = 3
+
+        plt.figure(figsize=(6,6))
+        plt.imshow(grid, cmap="viridis")
+        plt.grid(True)
+        plt.xticks(range(self.width))
+        plt.yticks(range(self.height))
+        plt.title("Multi-Domain Swarm Simulation")
+        plt.show()
