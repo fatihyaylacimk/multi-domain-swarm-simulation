@@ -69,3 +69,32 @@ def render_visual(self, agents=None, goal=None):
     plt.show(block=True)
 
 
+
+import matplotlib.pyplot as plt
+
+def render_gui(self, agents=None, goal=None):
+    agents = agents if agents else []
+
+    plt.figure(figsize=(6, 6))
+    plt.xlim(0, self.width)
+    plt.ylim(0, self.height)
+    plt.gca().set_aspect('equal')
+    plt.grid(True)
+
+    # Obstacles
+    for (x, y) in self.obstacles:
+        plt.scatter(x + 0.5, y + 0.5, c='black', s=200)
+
+    # Goal
+    if goal:
+        plt.scatter(goal[0] + 0.5, goal[1] + 0.5, c='green', s=200, marker='*')
+
+    # Agents
+    for agent in agents:
+        plt.scatter(agent.x + 0.5, agent.y + 0.5, c='blue', s=100)
+
+    plt.gca().invert_yaxis()
+    plt.show()
+
+
+
