@@ -1,66 +1,27 @@
-from map import GridMap
-from algorithms.prioritized_astar import prioritized_astar
+import matplotlib.pyplot as plt
+import numpy as np
 
-def main():
-    print("=== SIMULATION START ===")
+# Grid size
+WIDTH = 10
+HEIGHT = 10
 
-    # Grid ayarları
-    width = 10
-    height = 10
+# Obstacles
+obstacles = [(3,3), (3,4), (3,5), (6,6), (7,6)]
 
-    obstacles = [
-        (2, 2), (2, 3), (2, 4),
-        (4, 6), (5, 6), (6, 6)
-    ]
+def draw_grid(obstacles):
+    grid = np.zeros((HEIGHT, WIDTH))
 
-    grid = GridMap(width, height, obstacles)
+    for (x, y) in obstacles:
+        grid[y][x] = 1  # obstacle
 
-    # Hedef
-    goal = (5, 5)
+    plt.figure(figsize=(6,6))
+    plt.imshow(grid, cmap="gray_r")
 
-    # Agent başlangıç noktaları
-    agents = [
-        {"name": "LAND 1", "start": (0, 0)},
-        {"name": "LAND 2", "start": (1, 8)},
-        {"name": "LAND 3", "start": (8, 1)},
-    ]
+    plt.xticks(range(WIDTH))
+    plt.yticks(range(HEIGHT))
+    plt.grid(True)
 
-    all_paths = []
+    plt.title("Grid Map Background")
+    plt.show()
 
-    for agent in agents:
-        path = prioritized_astar(
-            grid=grid,
-            start=agent["start"],
-            goal=goal,
-            reserved_paths=all_paths
-        )
-
-        if path:
-            print(f"{agent['name']} path: {path}")
-            print(f"{agent['name']} final: {path[-1]}")
-            all_paths.append(path)
-        else:
-            print(f"{agent['name']} -> NO PATH FOUND")
-            print(f"{agent['name']} final: NO MOVE")
-            all_paths.append([])
-
-    print("\nFINAL MAP VIEW:")
-    grid.render(
-        agents=[type("A", (), {"x": p[-1][0], "y": p[-1][1]})
-                for p in all_paths if p],
-        goal=goal
-    )
-
-    print("=== SIMULATION END ===")
-
-    # >>> GUI AÇILAN KISIM (ÖNEMLİ) <<<
-    print("GUI OPENING...")
-    grid.render_gui(
-        agents=[type("A", (), {"x": p[-1][0], "y": p[-1][1]})
-                for p in all_paths if p],
-        goal=goal
-    )
-
-
-if __name__ == "__main__":
-    main()
+draw_grid(obstacles)
