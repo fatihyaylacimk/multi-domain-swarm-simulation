@@ -29,9 +29,14 @@ def draw_grid(obstacles, path):
         grid[y][x] = 1
 
     plt.figure(figsize=(6, 6))
-    plt.imshow(grid, cmap="gray_r")
+    plt.imshow(grid, cmap="gray_r", origin="lower")
     plt.grid(True)
     plt.title("Final Map View")
-    plt.show()
+
+    # 🔴 EN KRİTİK SATIR
+    plt.show(block=True)
 
 draw_grid(obstacles, path)
+
+# 🔴 POWERSHELL KAPANMASIN DİYE
+input("Press Enter to exit...")
