@@ -70,3 +70,4 @@ class GridMap:
         plt.grid(True)
         plt.legend()
         plt.show()
+plt.show(block=True)
