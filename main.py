@@ -39,3 +39,6 @@ print("\nFINAL MAP:")
 grid.render(agents=agents, goal=goal)
 
 print("=== SIMULATION END ===")
+
+# === VISUAL RENDER ===
+grid.render_visual(agents=agents, goal=goal)
