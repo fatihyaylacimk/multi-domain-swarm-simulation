@@ -2,48 +2,81 @@ import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 
+from environment.map import GridMap
+from agents.agent import Agent
+from algorithms.bfs import bfs
 
+# =========================
+# SIMULATION SETUP
+# =========================
 
+width, height = 10, 10
+obstacles = [(2,2), (2,3), (2,4), (4,5), (5,5), (6,5)]
+goal = (5, 5)
 
-import matplotlib
-matplotlib.use("TkAgg")
+grid = GridMap(width, height, obstacles)
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-WIDTH = 6
-HEIGHT = 6
-
-obstacles = [
-    (3, 3),
-    (3, 4),
-    (3, 5),
+agents = [
+    Agent("LAND 1", 0, 0),
+    Agent("LAND 2", 0, 1),
+    Agent("LAND 3", 1, 0),
 ]
 
-path = [
-    (0, 0), (0, 1), (0, 2), (0, 3),
-    (0, 4), (0, 5), (1, 5), (2, 5),
-    (3, 5), (4, 5), (5, 5)
-]
+paths = {}
 
-def draw_grid(obstacles, path):
-    grid = np.zeros((HEIGHT, WIDTH))
+print("=== SIMULATION START ===")
 
-    for (x, y) in obstacles:
-        grid[y][x] = -1
+for agent in agents:
+    path = bfs(grid, agent.position(), goal)
 
-    for (x, y) in path:
-        grid[y][x] = 1
+    if not path:
+        print(f"{agent.name} -> NO PATH FOUND")
+        paths[agent.name] = []
+        continue
 
-    plt.figure(figsize=(6, 6))
-    plt.imshow(grid, cmap="gray_r", origin="lower")
-    plt.grid(True)
-    plt.title("Final Map View")
+    paths[agent.name] = path
+    agent.x, agent.y = path[-1]
 
-    # 🔴 EN KRİTİK SATIR
-    plt.show(block=True)
+    print(f"{agent.name} path: {path}")
+    print(f"{agent.name} final: {path[-1]}")
 
-draw_grid(obstacles, path)
+print("=== SIMULATION END ===")
 
-# 🔴 POWERSHELL KAPANMASIN DİYE
+# =========================
+# VISUALIZATION
+# =========================
+
+plt.figure(figsize=(6, 6))
+plt.xlim(0, grid.width)
+plt.ylim(0, grid.height)
+plt.gca().set_aspect("equal")
+
+# Grid lines
+for x in range(grid.width + 1):
+    plt.plot([x, x], [0, grid.height], color="lightgray", linewidth=0.5)
+for y in range(grid.height + 1):
+    plt.plot([0, grid.width], [y, y], color="lightgray", linewidth=0.5)
+
+# Obstacles
+for (ox, oy) in grid.obstacles:
+    plt.fill_between([ox, ox + 1], oy, oy + 1, color="black")
+
+# Goal
+plt.fill_between([goal[0], goal[0] + 1], goal[1], goal[1] + 1, color="green")
+
+# Agent paths
+colors = ["red", "blue", "orange"]
+for (agent, color) in zip(agents, colors):
+    path = paths.get(agent.name, [])
+    if not path:
+        continue
+
+    xs = [p[0] + 0.5 for p in path]
+    ys = [p[1] + 0.5 for p in path]
+    plt.plot(xs, ys, marker="o", color=color, label=agent.name)
+
+plt.legend()
+plt.title("Multi-Domain Swarm Simulation")
+plt.show()
+
 input("Press Enter to exit...")
