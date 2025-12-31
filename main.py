@@ -113,3 +113,7 @@ def run_simulation():
 # -------------------------
 if __name__ == "__main__":
     run_simulation()
+
+print("GUI OPENING...")
+grid.render_gui(agents=agents, goal=goal)
+
