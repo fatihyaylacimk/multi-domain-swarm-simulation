@@ -1,13 +1,3 @@
-import matplotlib
-matplotlib.use("TkAgg")
-
-import matplotlib.pyplot as plt
-
-
-
-
-
-
 import matplotlib.pyplot as plt
 
 
@@ -32,8 +22,10 @@ class GridMap:
                 result.append((nx, ny))
         return result
 
+    # === TEXT MAP ===
     def render(self, agents=None, goal=None):
         agents = agents if agents else []
+
         for y in range(self.height):
             row = ""
             for x in range(self.width):
@@ -47,36 +39,34 @@ class GridMap:
                     row += ". "
             print(row)
 
+    # === GUI MAP ===
     def render_gui(self, agents=None, goal=None):
         agents = agents if agents else []
 
         plt.figure(figsize=(6, 6))
 
-        # Draw grid
-        for x in range(self.width + 1):
-            plt.plot([x, x], [0, self.height], color="gray", linewidth=0.5)
-        for y in range(self.height + 1):
-            plt.plot([0, self.width], [y, y], color="gray", linewidth=0.5)
+        # Grid
+        for x in range(self.width):
+            for y in range(self.height):
+                plt.scatter(x, y, c="white", edgecolors="black", s=400)
 
         # Obstacles
         for (x, y) in self.obstacles:
-            plt.fill_between([x, x + 1], y, y + 1, color="black")
+            plt.scatter(x, y, c="black", s=400)
 
         # Goal
         if goal:
-            gx, gy = goal
-            plt.scatter(gx + 0.5, gy + 0.5, c="green", s=200, label="Goal")
+            plt.scatter(goal[0], goal[1], c="green", s=400, label="Goal")
 
         # Agents
-        for a in agents:
-            plt.scatter(a.x + 0.5, a.y + 0.5, s=150, label=a.name)
+        colors = ["red", "blue", "orange", "purple"]
+        for i, agent in enumerate(agents):
+            plt.scatter(agent.x, agent.y, c=colors[i % len(colors)], s=400, label=agent.name)
 
-        plt.xlim(0, self.width)
-        plt.ylim(0, self.height)
-        plt.gca().set_aspect("equal")
         plt.title("Multi-Domain Swarm Simulation")
-        plt.legend()
+        plt.xlim(-1, self.width)
+        plt.ylim(-1, self.height)
+        plt.gca().set_aspect("equal")
         plt.grid(True)
-
-        # 🔥 BU SATIR KRİTİK
-        plt.show(block=True)
+        plt.legend()
+        plt.show()
