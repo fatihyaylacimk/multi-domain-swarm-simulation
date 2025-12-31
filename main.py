@@ -1,119 +1,66 @@
-# =========================
-# main.py
-# Multi-Domain Swarm Simulation
-# =========================
-
 from map import GridMap
-import heapq
-import time
+from algorithms.prioritized_astar import prioritized_astar
 
+def main():
+    print("=== SIMULATION START ===")
 
-# -------------------------
-# A* PATHFINDING
-# -------------------------
-def heuristic(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    # Grid ayarları
+    width = 10
+    height = 10
 
-
-def astar(grid, start, goal):
-    frontier = []
-    heapq.heappush(frontier, (0, start))
-
-    came_from = {start: None}
-    cost_so_far = {start: 0}
-
-    while frontier:
-        _, current = heapq.heappop(frontier)
-
-        if current == goal:
-            break
-
-        for nx, ny in grid.neighbors(*current):
-            new_cost = cost_so_far[current] + 1
-            next_node = (nx, ny)
-
-            if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
-                cost_so_far[next_node] = new_cost
-                priority = new_cost + heuristic(goal, next_node)
-                heapq.heappush(frontier, (priority, next_node))
-                came_from[next_node] = current
-
-    if goal not in came_from:
-        return []
-
-    # Path reconstruction
-    path = []
-    cur = goal
-    while cur:
-        path.append(cur)
-        cur = came_from[cur]
-    path.reverse()
-    return path
-
-
-# -------------------------
-# AGENT CLASS
-# -------------------------
-class Agent:
-    def __init__(self, name, x, y, goal):
-        self.name = name
-        self.x = x
-        self.y = y
-        self.goal = goal
-        self.path = []
-
-    def compute_path(self, grid):
-        self.path = astar(grid, (self.x, self.y), self.goal)
-
-    def move(self):
-        if len(self.path) > 1:
-            self.path.pop(0)
-            self.x, self.y = self.path[0]
-
-
-# -------------------------
-# MAIN SIMULATION
-# -------------------------
-def run_simulation():
-    width, height = 10, 10
-    obstacles = [(3, 3), (3, 4), (3, 5), (6, 6), (7, 6)]
-    goal = (8, 8)
+    obstacles = [
+        (2, 2), (2, 3), (2, 4),
+        (4, 6), (5, 6), (6, 6)
+    ]
 
     grid = GridMap(width, height, obstacles)
 
+    # Hedef
+    goal = (5, 5)
+
+    # Agent başlangıç noktaları
     agents = [
-        Agent("LAND 1", 0, 0, goal),
-        Agent("LAND 2", 0, 5, goal),
-        Agent("LAND 3", 5, 0, goal),
+        {"name": "LAND 1", "start": (0, 0)},
+        {"name": "LAND 2", "start": (1, 8)},
+        {"name": "LAND 3", "start": (8, 1)},
     ]
 
-    print("=== SIMULATION START ===")
+    all_paths = []
 
     for agent in agents:
-        agent.compute_path(grid)
-        if agent.path:
-            print(f"{agent.name} path: {agent.path}")
-        else:
-            print(f"{agent.name} -> NO PATH FOUND")
+        path = prioritized_astar(
+            grid=grid,
+            start=agent["start"],
+            goal=goal,
+            reserved_paths=all_paths
+        )
 
-    # STEP-BY-STEP MOVEMENT
-    for _ in range(20):
-        for agent in agents:
-            agent.move()
-        time.sleep(0.2)
+        if path:
+            print(f"{agent['name']} path: {path}")
+            print(f"{agent['name']} final: {path[-1]}")
+            all_paths.append(path)
+        else:
+            print(f"{agent['name']} -> NO PATH FOUND")
+            print(f"{agent['name']} final: NO MOVE")
+            all_paths.append([])
+
+    print("\nFINAL MAP VIEW:")
+    grid.render(
+        agents=[type("A", (), {"x": p[-1][0], "y": p[-1][1]})
+                for p in all_paths if p],
+        goal=goal
+    )
 
     print("=== SIMULATION END ===")
 
-    # FINAL GUI RENDER
-    grid.render_gui(agents=agents, goal=goal)
+    # >>> GUI AÇILAN KISIM (ÖNEMLİ) <<<
+    print("GUI OPENING...")
+    grid.render_gui(
+        agents=[type("A", (), {"x": p[-1][0], "y": p[-1][1]})
+                for p in all_paths if p],
+        goal=goal
+    )
 
 
-# -------------------------
-# ENTRY POINT
-# -------------------------
 if __name__ == "__main__":
-    run_simulation()
-
-print("GUI OPENING...")
-grid.render_gui(agents=agents, goal=goal)
-
+    main()
