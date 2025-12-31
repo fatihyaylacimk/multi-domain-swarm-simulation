@@ -22,4 +22,10 @@ import numpy as np
         plt.imshow(grid, cmap="viridis")
         plt.title("Multi-Domain Swarm Simulation")
         plt.grid(True)
-        plt.show()
+        
+plt.show(block=True)
+plt.figure(figsize=(6, 6))
+plt.imshow(grid, cmap="viridis")
+plt.title("Multi-Domain Swarm Simulation")
+plt.grid(True)
+plt.show(block=True)
