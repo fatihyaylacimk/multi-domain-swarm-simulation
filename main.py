@@ -1,59 +1,53 @@
-import time
+# =========================
+# Multi-Domain Swarm Simulation
+# main.py
+# =========================
 
 from environment.map import GridMap
 from agents.agent import Agent
 from algorithms.prioritized_astar import prioritized_astar
 
-# ======================
+# -------------------------
 # SIMULATION SETUP
-# ======================
+# -------------------------
 print("=== SIMULATION START ===")
 
-grid = GridMap(
-    width=10,
-    height=10,
-    obstacles=[]
-)
+# Grid map
+width = 10
+height = 10
+obstacles = []  # obstacle eklemek istersen [(x,y), ...]
+grid = GridMap(width, height, obstacles)
 
+# Goal
+goal = (5, 5)
+
+# Agents
 agents = [
     Agent("LAND 1", 0, 0, speed=1),
     Agent("LAND 2", 1, 0, speed=1),
     Agent("LAND 3", 2, 0, speed=1),
 ]
 
-goal = (5, 5)
-
-# ======================
+# -------------------------
 # PATH PLANNING
-# ======================
+# -------------------------
 paths = prioritized_astar(grid, agents, goal)
 
+# -------------------------
+# RESULTS
+# -------------------------
 for name, path in paths.items():
-    if path:
-        print(f"{name} path: {path}")
+    if len(path) == 0:
+        print(f"{name} path: []")
+        print(f"{name} final: NO MOVE")
     else:
-        print(f"{name} -> NO PATH FOUND")
+        print(f"{name} path: {path}")
+        print(f"{name} final: {path[-1]}")
 
-# ======================
-# ADIM ADIM SIMULATION
-# ======================
-max_steps = max(len(p) for p in paths.values())
+# -------------------------
+# FINAL MAP (GUI)
+# -------------------------
+print("\nFINAL MAP VIEW:")
+grid.render_gui(agents, goal)
 
-for step in range(max_steps):
-    print(f"\n--- STEP {step} ---")
-
-    for agent in agents:
-        path = paths.get(agent.name, [])
-
-        if step < len(path):
-            x, y = path[step]
-            agent.x = x
-            agent.y = y
-
-    grid.render_visual(agents=agents, goal=goal)
-    time.sleep(0.6)
-
-# ======================
-# FINAL STATE
-# ======================
-print("\n=== SIMULATION END ===")
+print("=== SIMULATION END ===")
