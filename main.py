@@ -1,65 +1,59 @@
-# =========================
-# MAIN ENTRY POINT
-# =========================
+import time
 
-from cevre.map import GridMap
+from environment.map import GridMap
 from agents.agent import Agent
 from algorithms.prioritized_astar import prioritized_astar
 
+# ======================
+# SIMULATION SETUP
+# ======================
 print("=== SIMULATION START ===")
 
-# -------------------------
-# GRID SETUP
-# -------------------------
-width = 10
-height = 10
+grid = GridMap(
+    width=10,
+    height=10,
+    obstacles=[]
+)
 
-obstacles = [
-    (2, 2), (2, 3), (2, 4),
-    (4, 6), (5, 6), (6, 6)
-]
-
-grid = GridMap(width, height, obstacles)
-
-# -------------------------
-# AGENTS
-# -------------------------
 agents = [
     Agent("LAND 1", 0, 0, speed=1),
     Agent("LAND 2", 1, 0, speed=1),
-    Agent("LAND 3", 0, 1, speed=1),
+    Agent("LAND 3", 2, 0, speed=1),
 ]
 
-# -------------------------
-# GOAL
-# -------------------------
 goal = (5, 5)
 
-# -------------------------
+# ======================
 # PATH PLANNING
-# -------------------------
+# ======================
 paths = prioritized_astar(grid, agents, goal)
 
-# -------------------------
-# RESULTS
-# -------------------------
 for name, path in paths.items():
-    print(f"{name} path: {path}")
     if path:
-        print(f"{name} final: {path[-1]}")
+        print(f"{name} path: {path}")
     else:
-        print(f"{name} final: NO MOVE")
+        print(f"{name} -> NO PATH FOUND")
 
-# -------------------------
-# FINAL MAP (ASCII)
-# -------------------------
-print("\nFINAL MAP VIEW:")
-grid.render(agents=agents, goal=goal)
+# ======================
+# ADIM ADIM SIMULATION
+# ======================
+max_steps = max(len(p) for p in paths.values())
 
-# -------------------------
-# VISUAL MAP (MATPLOTLIB)
-# -------------------------
-print("\nVISUAL MAP:")
-grid.render_visual(agents=agents, goal=goal)
+for step in range(max_steps):
+    print(f"\n--- STEP {step} ---")
 
-print("=== SIMULATION END ===")
+    for agent in agents:
+        path = paths.get(agent.name, [])
+
+        if step < len(path):
+            x, y = path[step]
+            agent.x = x
+            agent.y = y
+
+    grid.render_visual(agents=agents, goal=goal)
+    time.sleep(0.6)
+
+# ======================
+# FINAL STATE
+# ======================
+print("\n=== SIMULATION END ===")
