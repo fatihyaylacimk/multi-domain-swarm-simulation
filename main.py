@@ -1,75 +1,56 @@
-# ===============================
-# MULTI-DOMAIN SWARM SIMULATION
-# MAIN ENTRY FILE
-# ===============================
-
-from environment.map import GridMap
-from agents.agent import Agent
 from algorithms.prioritized_astar import prioritized_astar
+from map import GridMap
+from agent import Agent
 
 
 def main():
     print("=== SIMULATION START ===")
 
-    # -------------------------------
-    # GRID CONFIGURATION
-    # -------------------------------
-    width = 10
-    height = 10
+    # Grid size
+    width = 6
+    height = 6
 
+    # Obstacles
     obstacles = [
-        # örnek engeller (istersen ekleyebilirsin)
-        # (3, 3), (3, 4), (3, 5)
+        (1, 2), (2, 2), (3, 2),
+        (3, 3), (3, 4)
     ]
 
+    # Create grid
     grid = GridMap(width, height, obstacles)
 
-    # -------------------------------
-    # AGENTS
-    # name, x, y, speed
-    # -------------------------------
-    agents = [
-        Agent("LAND 1", 0, 0, speed=1),
-        Agent("LAND 2", 2, 2, speed=1),
-        Agent("LAND 3", 4, 4, speed=1),
-    ]
-
-    # -------------------------------
-    # GOAL
-    # -------------------------------
+    # Goal position
     goal = (5, 5)
 
-    # -------------------------------
-    # PATH PLANNING
-    # -------------------------------
-    paths = prioritized_astar(grid, agents, goal)
+    # Agents (id, start_x, start_y, speed)
+    agents = [
+        Agent("LAND 1", 0, 0, speed=1),
+        Agent("LAND 2", 0, 5, speed=1),
+        Agent("LAND 3", 5, 0, speed=1)
+    ]
 
-    # -------------------------------
-    # OUTPUT RESULTS
-    # -------------------------------
-    for agent in agents:
-        name = agent.name
-        path = paths.get(name, [])
+    # Collect start positions
+    starts = [(a.x, a.y) for a in agents]
 
-        if not path:
-            print(f"{name} -> NO PATH FOUND")
-            print(f"{name} path: []")
-            print(f"{name} final: NO MOVE")
+    # Run prioritized A*
+    paths = prioritized_astar(grid, starts, goal)
+
+    # Assign paths to agents
+    for agent, path in zip(agents, paths):
+        agent.path = path
+        if path:
+            print(f"{agent.name} path: {path}")
         else:
-            print(f"{name} path: {path}")
-            print(f"{name} final: {path[-1]}")
+            print(f"{agent.name} -> NO PATH FOUND")
 
-    # -------------------------------
-    # VISUALIZATION (GUI)
-    # -------------------------------
-    print("\nFINAL MAP VIEW:")
+    print("\nFINAL MAP VIEW (TEXT):")
+    grid.render(agents, goal)
+
+    print("\nOPENING GUI...")
     grid.render_gui(agents, goal)
 
     print("=== SIMULATION END ===")
 
 
-# -------------------------------
-# RUN
-# -------------------------------
 if __name__ == "__main__":
     main()
