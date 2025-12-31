@@ -11,7 +11,7 @@ class GridMap:
         return (x, y) not in self.obstacles
 
     def neighbors(self, x, y):
-        directions = [(1,0), (-1,0), (0,1), (0,-1)]
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         result = []
         for dx, dy in directions:
             nx, ny = x + dx, y + dy
@@ -22,6 +22,7 @@ class GridMap:
     def render(self, agents=None, goal=None):
         agents = agents if agents else []
 
+        print("\nFINAL MAP VIEW:")
         for y in range(self.height):
             row = ""
             for x in range(self.width):
