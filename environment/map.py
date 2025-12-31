@@ -1,100 +1,58 @@
-import matplotlib
-matplotlib.use("TkAgg")
-
 import matplotlib.pyplot as plt
-import numpy as np
 
 
+class GridMap:
+    def __init__(self, width, height, obstacles=None):
+        self.width = width
+        self.height = height
+        self.obstacles = obstacles if obstacles else []
 
+        # GUI için tek pencere kullanacağız
+        plt.ion()
+        self.fig, self.ax = plt.subplots(figsize=(6, 6))
 
+    def in_bounds(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height
 
+    def is_free(self, x, y):
+        return (x, y) not in self.obstacles
 
+    def neighbors(self, x, y):
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        result = []
 
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if self.in_bounds(nx, ny) and self.is_free(nx, ny):
+                result.append((nx, ny))
 
+        return result
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-    def render_visual(self, agents=None, goal=None):
+    def render_gui(self, agents=None, goal=None):
         agents = agents if agents else []
 
-        grid = np.zeros((self.height, self.width))
+        self.ax.clear()
+        self.ax.set_title("Multi-Domain Swarm Simulation")
 
-        # obstacles
+        # Grid ayarları
+        self.ax.set_xlim(-0.5, self.width - 0.5)
+        self.ax.set_ylim(-0.5, self.height - 0.5)
+        self.ax.set_xticks(range(self.width))
+        self.ax.set_yticks(range(self.height))
+        self.ax.grid(True)
+        self.ax.invert_yaxis()
+
+        # Obstacles
         for (x, y) in self.obstacles:
-            grid[y][x] = -1
+            self.ax.scatter(x, y, c="black", s=300)
 
-        # goal
+        # Goal
         if goal:
-            gx, gy = goal
-            grid[gy][gx] = 2
+            self.ax.scatter(goal[0], goal[1], c="green", s=300, marker="*")
 
-        # agents
-        for a in agents:
-            grid[a.y][a.x] = 1
+        # Agents
+        for agent in agents:
+            self.ax.scatter(agent.x, agent.y, c="blue", s=150)
+            self.ax.text(agent.x + 0.1, agent.y + 0.1, agent.name, fontsize=8)
 
-        plt.figure(figsize=(6, 6))
-        plt.imshow(grid, cmap="viridis")
-        plt.title("Multi-Domain Swarm Simulation")
-        plt.grid(True)
-        
-plt.show(block=True)
-plt.figure(figsize=(6, 6))
-plt.imshow(grid, cmap="viridis")
-plt.title("Multi-Domain Swarm Simulation")
-plt.grid(True)
-plt.show(block=True)
-
-def render_visual(self, agents=None, goal=None):
-    grid = np.zeros((self.height, self.width))
-
-    # Obstacles
-    for (x, y) in self.obstacles:
-        grid[y][x] = 1
-
-    # Goal
-    if goal:
-        gx, gy = goal
-        grid[gy][gx] = 3
-
-    # Agents
-    if agents:
-        for a in agents:
-            grid[a.y][a.x] = 2
-
-    plt.figure(figsize=(6, 6))
-    plt.imshow(grid, cmap="viridis")
-    plt.title("Multi-Domain Swarm Simulation")
-    plt.grid(True)
-    plt.show(block=True)
-
-
-
-import matplotlib.pyplot as plt
-
-def render_gui(self, agents=None, goal=None):
-    agents = agents if agents else []
-
-    plt.figure(figsize=(6, 6))
-    plt.xlim(0, self.width)
-    plt.ylim(0, self.height)
-    plt.gca().set_aspect('equal')
-    plt.grid(True)
-
-    # Obstacles
-    for (x, y) in self.obstacles:
-        plt.scatter(x + 0.5, y + 0.5, c='black', s=200)
-
-    # Goal
-    if goal:
-        plt.scatter(goal[0] + 0.5, goal[1] + 0.5, c='green', s=200, marker='*')
-
-    # Agents
-    for agent in agents:
-        plt.scatter(agent.x + 0.5, agent.y + 0.5, c='blue', s=100)
-
-    plt.gca().invert_yaxis()
-    plt.show()
-
-
-
+        plt.pause(0.3)
