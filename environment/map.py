@@ -1,23 +1,36 @@
+class GridMap:
+    def __init__(self, width, height, obstacles=None):
+        self.width = width
+        self.height = height
+        self.obstacles = obstacles if obstacles else []
+
+    def in_bounds(self, x, y):
+        return 0 <= x < self.width and 0 <= y < self.height
+
+    def is_free(self, x, y):
+        return (x, y) not in self.obstacles
+
+    def neighbors(self, x, y):
+        directions = [(1,0), (-1,0), (0,1), (0,-1)]
+        result = []
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            if self.in_bounds(nx, ny) and self.is_free(nx, ny):
+                result.append((nx, ny))
+        return result
+
     def render(self, agents=None, goal=None):
-        view = [[ "." for _ in range(self.width)] for _ in range(self.height)]
+        agents = agents if agents else []
 
-        # engeller
         for y in range(self.height):
+            row = ""
             for x in range(self.width):
-                if self.grid[y][x] == 1:
-                    view[y][x] = "#"
-
-        # hedef
-        if goal:
-            gx, gy = goal
-            view[gy][gx] = "G"
-
-        # agentlar
-        if agents:
-            for a in agents:
-                x, y = a.position()
-                view[y][x] = "A" if a.agent_type == "LAND" else "H"
-
-        for row in view:
-            print(" ".join(row))
-        print()
+                if (x, y) in self.obstacles:
+                    row += "# "
+                elif goal and (x, y) == goal:
+                    row += "G "
+                elif any(a.x == x and a.y == y for a in agents):
+                    row += "A "
+                else:
+                    row += ". "
+            print(row)
