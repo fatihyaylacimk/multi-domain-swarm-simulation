@@ -134,7 +134,8 @@ def main():
                 for p in all_paths if p],
         goal=goal
     )
-
 import matplotlib.pyplot as plt
+plt.pause(0.1)
 plt.show(block=True)
+
 
