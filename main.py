@@ -1,32 +1,37 @@
 import matplotlib
 matplotlib.use("TkAgg")
 
-
-
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Grid size
-WIDTH = 10
-HEIGHT = 10
+WIDTH = 6
+HEIGHT = 6
 
-# Obstacles
-obstacles = [(3,3), (3,4), (3,5), (6,6), (7,6)]
+obstacles = [
+    (3, 3),
+    (3, 4),
+    (3, 5),
+]
 
-def draw_grid(obstacles):
+path = [
+    (0, 0), (0, 1), (0, 2), (0, 3),
+    (0, 4), (0, 5), (1, 5), (2, 5),
+    (3, 5), (4, 5), (5, 5)
+]
+
+def draw_grid(obstacles, path):
     grid = np.zeros((HEIGHT, WIDTH))
 
     for (x, y) in obstacles:
-        grid[y][x] = 1  # obstacle
+        grid[y][x] = -1
 
-    plt.figure(figsize=(6,6))
+    for (x, y) in path:
+        grid[y][x] = 1
+
+    plt.figure(figsize=(6, 6))
     plt.imshow(grid, cmap="gray_r")
-
-    plt.xticks(range(WIDTH))
-    plt.yticks(range(HEIGHT))
     plt.grid(True)
-
-    plt.title("Grid Map Background")
+    plt.title("Final Map View")
     plt.show()
 
-draw_grid(obstacles)
+draw_grid(obstacles, path)
