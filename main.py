@@ -11,6 +11,18 @@ from agents.agent import Agent
 from agents.agent import Agent
 import time
 
+from agents.agent import Agent
+
+print("AGENT CLASS FROM:", Agent.__module__)
+print("AGENT FILE:", Agent.__dict__.get('__file__', 'NO FILE INFO'))
+print("HAS set_path:", hasattr(Agent, "set_path"))
+
+
+
+
+
+
+
 GRID_SIZE = 10
 
 def simple_path(start, goal):
