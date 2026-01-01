@@ -3,13 +3,20 @@ class Agent:
         self.name = name
         self.start = start
         self.goal = goal
+
         self.path = []
-        self.final = None
         self.step_index = 0
+
+        # AKTİF POZİSYON
+        self.position = start
+
+        self.final = None
 
     def set_path(self, path):
         self.path = path
         self.step_index = 0
+        self.position = self.start
+
         if path:
             self.final = path[-1]
         else:
@@ -17,7 +24,7 @@ class Agent:
 
     def move_step(self):
         if self.step_index < len(self.path):
-            pos = self.path[self.step_index]
+            self.position = self.path[self.step_index]
             self.step_index += 1
-            return pos
+            return self.position
         return None
