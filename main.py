@@ -39,9 +39,8 @@ def astar(grid, start, goal):
 
     return []
 
-
 # -----------------------------
-# AGENT CLASS
+# AGENT
 # -----------------------------
 class Agent:
     def __init__(self, name, start, goal):
@@ -51,19 +50,19 @@ class Agent:
         self.path = []
         self.final = None
 
-
 # -----------------------------
-# GRID (10x10)
+# GRID (SABİT)
 # -----------------------------
-grid = [[0 for _ in range(10)] for _ in range(10)]
+GRID_SIZE = 10
+grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
 # -----------------------------
 # AGENTS
 # -----------------------------
 agents = [
-    Agent("LAND 1", start=(0, 0), goal=(5, 5)),
-    Agent("LAND 2", start=(1, 0), goal=(1, 5)),   # ÇALIŞAN
-    Agent("LAND 3", start=(0, 5), goal=(9, 9))    # Şimdilik yok
+    Agent("LAND 1", (0, 0), (5, 5)),
+    Agent("LAND 2", (1, 0), (1, 5)),
+    Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
 # -----------------------------
@@ -89,7 +88,7 @@ for agent in agents:
 # -----------------------------
 print("\nFINAL MAP VIEW:")
 
-final_map = [["." for _ in range(10)] for _ in range(10)]
+final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
 for agent in agents:
     if agent.final != "NO MOVE":
