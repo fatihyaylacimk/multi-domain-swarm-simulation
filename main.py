@@ -19,11 +19,9 @@ def simple_path(start, goal):
     return path
 
 
-# IMPORT AGENT
 from agents.agent import Agent
 
 
-# CREATE AGENTS
 agents = [
     Agent("LAND 1", (0, 0), (5, 5)),
     Agent("LAND 2", (1, 0), (1, 5)),
@@ -31,13 +29,11 @@ agents = [
 ]
 
 
-# ASSIGN PATHS
 for agent in agents:
     path = simple_path(agent.start, agent.goal)
     agent.set_path(path)
 
 
-# STEP-BY-STEP SIMULATION
 max_steps = max(len(agent.path) for agent in agents)
 
 for step in range(max_steps):
@@ -51,7 +47,6 @@ for step in range(max_steps):
             print(f"{agent.name} has finished")
 
 
-# FINAL MAP VIEW
 print("\nFINAL MAP VIEW:")
 final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
