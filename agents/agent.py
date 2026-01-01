@@ -1,3 +1,9 @@
+print("### AGENT.PY LOADED ###")
+
+
+
+
+
 class Agent:
     def __init__(self, name, start, goal):
         self.name = name
