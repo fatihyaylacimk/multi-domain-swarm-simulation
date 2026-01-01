@@ -1,82 +1,67 @@
-import matplotlib
-matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
+import time
 
-from environment.map import GridMap
-from agents.agent import Agent
-from algorithms.bfs import bfs
+# ======================
+# GRID AYARLARI
+# ======================
+GRID_SIZE = 6
 
-# =========================
-# SIMULATION SETUP
-# =========================
+# ======================
+# AGENT SINIFI
+# ======================
+class Agent:
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+        self.path = [(x, y)]
 
-width, height = 10, 10
-obstacles = [(2,2), (2,3), (2,4), (4,5), (5,5), (6,5)]
-goal = (5, 5)
+    def move(self):
+        if self.x < GRID_SIZE - 1:
+            self.x += 1
+        elif self.y < GRID_SIZE - 1:
+            self.y += 1
+        self.path.append((self.x, self.y))
 
-grid = GridMap(width, height, obstacles)
 
-agents = [
-    Agent("LAND 1", 0, 0),
-    Agent("LAND 2", 0, 1),
-    Agent("LAND 3", 1, 0),
-]
+# ======================
+# GRAFIK ÇIZIMI
+# ======================
+def render(agent):
+    plt.clf()
 
-paths = {}
+    # grid
+    plt.xticks(range(GRID_SIZE))
+    plt.yticks(range(GRID_SIZE))
+    plt.grid(True)
 
-print("=== SIMULATION START ===")
+    # agent path
+    xs = [p[0] for p in agent.path]
+    ys = [p[1] for p in agent.path]
+    plt.plot(xs, ys, marker="o")
 
-for agent in agents:
-    path = bfs(grid, agent.position(), goal)
+    # agent current position
+    plt.scatter(agent.x, agent.y, s=200)
 
-    if not path:
-        print(f"{agent.name} -> NO PATH FOUND")
-        paths[agent.name] = []
-        continue
+    plt.xlim(-0.5, GRID_SIZE - 0.5)
+    plt.ylim(-0.5, GRID_SIZE - 0.5)
+    plt.title("Agent Movement")
+    plt.pause(0.3)
 
-    paths[agent.name] = path
-    agent.x, agent.y = path[-1]
 
-    print(f"{agent.name} path: {path}")
-    print(f"{agent.name} final: {path[-1]}")
+# ======================
+# MAIN
+# ======================
+def main():
+    plt.ion()
+    agent = Agent()
 
-print("=== SIMULATION END ===")
+    for _ in range(10):
+        agent.move()
+        render(agent)
 
-# =========================
-# VISUALIZATION
-# =========================
+    plt.ioff()
+    plt.show()
 
-plt.figure(figsize=(6, 6))
-plt.xlim(0, grid.width)
-plt.ylim(0, grid.height)
-plt.gca().set_aspect("equal")
 
-# Grid lines
-for x in range(grid.width + 1):
-    plt.plot([x, x], [0, grid.height], color="lightgray", linewidth=0.5)
-for y in range(grid.height + 1):
-    plt.plot([0, grid.width], [y, y], color="lightgray", linewidth=0.5)
-
-# Obstacles
-for (ox, oy) in grid.obstacles:
-    plt.fill_between([ox, ox + 1], oy, oy + 1, color="black")
-
-# Goal
-plt.fill_between([goal[0], goal[0] + 1], goal[1], goal[1] + 1, color="green")
-
-# Agent paths
-colors = ["red", "blue", "orange"]
-for (agent, color) in zip(agents, colors):
-    path = paths.get(agent.name, [])
-    if not path:
-        continue
-
-    xs = [p[0] + 0.5 for p in path]
-    ys = [p[1] + 0.5 for p in path]
-    plt.plot(xs, ys, marker="o", color=color, label=agent.name)
-
-plt.legend()
-plt.title("Multi-Domain Swarm Simulation")
-plt.show()
-
-input("Press Enter to exit...")
+if __name__ == "__main__":
+    main()
