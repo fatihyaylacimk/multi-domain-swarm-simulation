@@ -1,28 +1,20 @@
 from agents.agent import Agent
 
-
-
-
-
-print("### STEP-BY-STEP AGENT MOVE ###")
-
-from agents.agent import Agent
-
 GRID_SIZE = 10
 
 def simple_path(start, goal):
     x, y = start
     gx, gy = goal
-    path = []
+    path = [(x, y)]
 
-    while (x, y) != (gx, gy):
+    while x != gx:
+        x += 1 if gx > x else -1
         path.append((x, y))
-        if x != gx:
-            x += 1 if gx > x else -1
-        elif y != gy:
-            y += 1 if gy > y else -1
 
-    path.append((gx, gy))
+    while y != gy:
+        y += 1 if gy > y else -1
+        path.append((x, y))
+
     return path
 
 
@@ -32,34 +24,22 @@ agents = [
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
-# Path ata
-for agent in agents:
-    agent.set_path(simple_path(agent.start, agent.goal))
-
 print("=== SIMULATION START ===")
 
-finished = False
-step = 0
+for agent in agents:
+    agent.path = simple_path(agent.start, agent.goal)
+    agent.final = agent.path[-1]
+    print(f"{agent.name} path: {agent.path}")
+    print(f"{agent.name} final: {agent.final}")
 
-while not finished:
-    print(f"\nSTEP {step}")
-    finished = True
+print("\nFINAL MAP VIEW:")
+final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
-    grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+for agent in agents:
+    x, y = agent.final
+    final_map[y][x] = "L"
 
-    for agent in agents:
-        if not agent.reached_goal():
-            agent.move()
-            finished = False
+for row in final_map:
+    print(" ".join(row))
 
-        x, y = agent.position()
-        grid[y][x] = "L"
-
-        print(f"{agent.name} -> {agent.position()}")
-
-    for row in grid:
-        print(" ".join(row))
-
-    step += 1
-
-print("\n=== SIMULATION END ===")
+print("=== SIMULATION END ===")
