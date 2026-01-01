@@ -6,6 +6,9 @@ import time
 # ======================
 GRID_SIZE = 6
 
+# ENGELLER (x, y)
+OBSTACLES = [(2, 2), (2, 3), (3, 3), (4, 1)]
+
 # ======================
 # AGENT SINIFI
 # ======================
@@ -15,37 +18,54 @@ class Agent:
         self.y = y
         self.path = [(x, y)]
 
+    def can_move(self, x, y):
+        if x < 0 or y < 0 or x >= GRID_SIZE or y >= GRID_SIZE:
+            return False
+        if (x, y) in OBSTACLES:
+            return False
+        return True
+
     def move(self):
-        if self.x < GRID_SIZE - 1:
+        # önce sağa dene
+        if self.can_move(self.x + 1, self.y):
             self.x += 1
-        elif self.y < GRID_SIZE - 1:
+        # sağ olmazsa yukarı dene
+        elif self.can_move(self.x, self.y + 1):
             self.y += 1
+        else:
+            print("NO MOVE")
+            return
+
         self.path.append((self.x, self.y))
 
 
 # ======================
-# GRAFIK ÇIZIMI
+# GRAFIK
 # ======================
 def render(agent):
     plt.clf()
 
-    # grid
     plt.xticks(range(GRID_SIZE))
     plt.yticks(range(GRID_SIZE))
     plt.grid(True)
 
-    # agent path
+    # ENGELLER
+    for ox, oy in OBSTACLES:
+        plt.scatter(ox, oy, c="red", s=400, marker="s")
+
+    # AGENT YOLU
     xs = [p[0] for p in agent.path]
     ys = [p[1] for p in agent.path]
     plt.plot(xs, ys, marker="o")
 
-    # agent current position
-    plt.scatter(agent.x, agent.y, s=200)
+    # AGENT
+    plt.scatter(agent.x, agent.y, c="blue", s=200)
 
     plt.xlim(-0.5, GRID_SIZE - 0.5)
     plt.ylim(-0.5, GRID_SIZE - 0.5)
-    plt.title("Agent Movement")
-    plt.pause(0.3)
+    plt.title("Agent with Obstacles")
+
+    plt.pause(0.4)
 
 
 # ======================
@@ -55,7 +75,7 @@ def main():
     plt.ion()
     agent = Agent()
 
-    for _ in range(10):
+    for _ in range(20):
         agent.move()
         render(agent)
 
