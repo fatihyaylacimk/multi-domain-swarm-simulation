@@ -1,69 +1,59 @@
-print("### NEW MAIN.PY RUNNING ###")
+print("### STEP-BY-STEP AGENT MOVE ###")
+
+from agents.agent import Agent
 
 GRID_SIZE = 10
 
-# -----------------------------
-# SADE PATH (ENGELSİZ)
-# -----------------------------
 def simple_path(start, goal):
     x, y = start
     gx, gy = goal
-    path = [(x, y)]
+    path = []
 
-    while x != gx:
-        x += 1 if gx > x else -1
+    while (x, y) != (gx, gy):
         path.append((x, y))
+        if x != gx:
+            x += 1 if gx > x else -1
+        elif y != gy:
+            y += 1 if gy > y else -1
 
-    while y != gy:
-        y += 1 if gy > y else -1
-        path.append((x, y))
-
+    path.append((gx, gy))
     return path
 
-# -----------------------------
-# AGENT
-# -----------------------------
-class Agent:
-    def __init__(self, name, start, goal):
-        self.name = name
-        self.start = start
-        self.goal = goal
-        self.path = []
-        self.final = None
 
-# -----------------------------
-# AGENTS
-# -----------------------------
 agents = [
     Agent("LAND 1", (0, 0), (5, 5)),
     Agent("LAND 2", (1, 0), (1, 5)),
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
-# -----------------------------
-# SIMULATION
-# -----------------------------
+# Path ata
+for agent in agents:
+    agent.set_path(simple_path(agent.start, agent.goal))
+
 print("=== SIMULATION START ===")
 
-for agent in agents:
-    agent.path = simple_path(agent.start, agent.goal)
-    agent.final = agent.path[-1]
+finished = False
+step = 0
 
-    print(f"{agent.name} path: {agent.path}")
-    print(f"{agent.name} final: {agent.final}")
+while not finished:
+    print(f"\nSTEP {step}")
+    finished = True
 
-# -----------------------------
-# FINAL MAP
-# -----------------------------
-print("\nFINAL MAP VIEW:")
+    grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
-final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+    for agent in agents:
+        if not agent.reached_goal():
+            agent.move()
+            finished = False
 
-for agent in agents:
-    x, y = agent.final
-    final_map[y][x] = "L"
+        x, y = agent.position()
+        grid[y][x] = "L"
 
-for row in final_map:
-    print(" ".join(row))
+        print(f"{agent.name} -> {agent.position()}")
 
-print("=== SIMULATION END ===")
+    for row in grid:
+        print(" ".join(row))
+
+    step += 1
+
+print("\n=== SIMULATION END ===")
