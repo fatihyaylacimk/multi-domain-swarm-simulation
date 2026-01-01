@@ -11,4 +11,4 @@ class Agent:
         if path:
             self.final = path[-1]
         else:
-            self.final = "NO MOVE"
+            self.final = None
