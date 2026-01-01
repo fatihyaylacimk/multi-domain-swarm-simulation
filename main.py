@@ -1,15 +1,4 @@
-print("### MAIN.PY LOADED ###")
-from agents.agent import Agent
-print("DEBUG has set_path:", hasattr(Agent, "set_path"))
-
-
-
-
-
-
-
-
-from agents.agent import Agent
+print("=== STEP-BY-STEP SIMULATION START ===")
 
 GRID_SIZE = 10
 
@@ -30,21 +19,39 @@ def simple_path(start, goal):
     return path
 
 
+# IMPORT AGENT
+from agents.agent import Agent
+
+
+# CREATE AGENTS
 agents = [
     Agent("LAND 1", (0, 0), (5, 5)),
     Agent("LAND 2", (1, 0), (1, 5)),
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
-print("=== SIMULATION START ===")
 
+# ASSIGN PATHS
 for agent in agents:
     path = simple_path(agent.start, agent.goal)
     agent.set_path(path)
 
-    print(f"{agent.name} path: {agent.path}")
-    print(f"{agent.name} final: {agent.final}")
 
+# STEP-BY-STEP SIMULATION
+max_steps = max(len(agent.path) for agent in agents)
+
+for step in range(max_steps):
+    print(f"\n--- STEP {step} ---")
+
+    for agent in agents:
+        pos = agent.move_step()
+        if pos is not None:
+            print(f"{agent.name} at {pos}")
+        else:
+            print(f"{agent.name} has finished")
+
+
+# FINAL MAP VIEW
 print("\nFINAL MAP VIEW:")
 final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
