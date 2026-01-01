@@ -1,89 +1,102 @@
-import matplotlib.pyplot as plt
-import time
+import heapq
 
-# ======================
-# GRID AYARLARI
-# ======================
-GRID_SIZE = 6
+# -----------------------------
+# A* PATHFINDING
+# -----------------------------
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-# ENGELLER (x, y)
-OBSTACLES = [(2, 2), (2, 3), (3, 3), (4, 1)]
+def astar(grid, start, goal):
+    rows, cols = len(grid), len(grid[0])
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    came_from = {}
+    g_score = {start: 0}
 
-# ======================
-# AGENT SINIFI
-# ======================
+    while open_set:
+        _, current = heapq.heappop(open_set)
+
+        if current == goal:
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+
+        for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                if grid[neighbor[0]][neighbor[1]] == 1:
+                    continue
+
+                tentative_g = g_score[current] + 1
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f = tentative_g + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f, neighbor))
+
+    return []
+
+
+# -----------------------------
+# AGENT CLASS
+# -----------------------------
 class Agent:
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
-        self.path = [(x, y)]
-
-    def can_move(self, x, y):
-        if x < 0 or y < 0 or x >= GRID_SIZE or y >= GRID_SIZE:
-            return False
-        if (x, y) in OBSTACLES:
-            return False
-        return True
-
-    def move(self):
-        # önce sağa dene
-        if self.can_move(self.x + 1, self.y):
-            self.x += 1
-        # sağ olmazsa yukarı dene
-        elif self.can_move(self.x, self.y + 1):
-            self.y += 1
-        else:
-            print("NO MOVE")
-            return
-
-        self.path.append((self.x, self.y))
+    def __init__(self, name, start, goal):
+        self.name = name
+        self.start = start
+        self.goal = goal
+        self.path = []
+        self.final = None
 
 
-# ======================
-# GRAFIK
-# ======================
-def render(agent):
-    plt.clf()
+# -----------------------------
+# GRID (10x10)
+# -----------------------------
+grid = [[0 for _ in range(10)] for _ in range(10)]
 
-    plt.xticks(range(GRID_SIZE))
-    plt.yticks(range(GRID_SIZE))
-    plt.grid(True)
+# -----------------------------
+# AGENTS
+# -----------------------------
+agents = [
+    Agent("LAND 1", start=(0, 0), goal=(5, 5)),
+    Agent("LAND 2", start=(1, 0), goal=(1, 5)),   # ÇALIŞAN
+    Agent("LAND 3", start=(0, 5), goal=(9, 9))    # Şimdilik yok
+]
 
-    # ENGELLER
-    for ox, oy in OBSTACLES:
-        plt.scatter(ox, oy, c="red", s=400, marker="s")
+# -----------------------------
+# SIMULATION
+# -----------------------------
+print("=== SIMULATION START ===")
 
-    # AGENT YOLU
-    xs = [p[0] for p in agent.path]
-    ys = [p[1] for p in agent.path]
-    plt.plot(xs, ys, marker="o")
+for agent in agents:
+    agent.path = astar(grid, agent.start, agent.goal)
 
-    # AGENT
-    plt.scatter(agent.x, agent.y, c="blue", s=200)
+    if agent.path:
+        agent.final = agent.path[-1]
+        print(f"{agent.name} path: {agent.path}")
+        print(f"{agent.name} final: {agent.final}")
+    else:
+        agent.final = "NO MOVE"
+        print(f"{agent.name} -> NO PATH FOUND")
+        print(f"{agent.name} path: []")
+        print(f"{agent.name} final: NO MOVE")
 
-    plt.xlim(-0.5, GRID_SIZE - 0.5)
-    plt.ylim(-0.5, GRID_SIZE - 0.5)
-    plt.title("Agent with Obstacles")
+# -----------------------------
+# FINAL MAP VIEW
+# -----------------------------
+print("\nFINAL MAP VIEW:")
 
-    plt.pause(0.4)
+final_map = [["." for _ in range(10)] for _ in range(10)]
 
+for agent in agents:
+    if agent.final != "NO MOVE":
+        r, c = agent.final
+        final_map[r][c] = "L"
 
-# ======================
-# MAIN
-# ======================
-def main():
-    plt.ion()
-    agent = Agent()
+for row in final_map:
+    print(" ".join(row))
 
-    for _ in range(20):
-        agent.move()
-        render(agent)
-
-    plt.ioff()
-    plt.show()
-
-
-if __name__ == "__main__":
-    main()
-input("Press ENTER to exit...")
-
+print("=== SIMULATION END ===")
