@@ -1,27 +1,4 @@
-print(Agent)
-
-
-
-
-
 from agents.agent import Agent
-
-
-
-from agents.agent import Agent
-import time
-
-from agents.agent import Agent
-
-print("AGENT CLASS FROM:", Agent.__module__)
-print("AGENT FILE:", Agent.__dict__.get('__file__', 'NO FILE INFO'))
-print("HAS set_path:", hasattr(Agent, "set_path"))
-
-
-
-
-
-
 
 GRID_SIZE = 10
 
@@ -47,26 +24,22 @@ agents = [
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
+print("=== SIMULATION START ===")
+
 for agent in agents:
     agent.set_path(simple_path(agent.start, agent.goal))
+    print(f"{agent.name} path: {agent.path}")
+    print(f"{agent.name} final: {agent.final}")
 
-print("=== STEP-BY-STEP SIMULATION START ===")
+print("\nFINAL MAP VIEW:")
+final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
-max_steps = max(len(a.path) for a in agents)
+for agent in agents:
+    if agent.final:
+        x, y = agent.final
+        final_map[y][x] = "L"
 
-for step in range(max_steps):
-    print(f"\n--- STEP {step} ---")
+for row in final_map:
+    print(" ".join(row))
 
-    grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-
-    for agent in agents:
-        x, y = agent.move_step()
-        grid[y][x] = "L"
-        print(f"{agent.name} at {agent.position}")
-
-    for row in grid:
-        print(" ".join(row))
-
-    time.sleep(0.5)
-
-print("\n=== SIMULATION END ===")
+print("=== SIMULATION END ===")
