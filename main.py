@@ -1,3 +1,14 @@
+print("### MAIN.PY LOADED ###")
+from agents.agent import Agent
+print("DEBUG has set_path:", hasattr(Agent, "set_path"))
+
+
+
+
+
+
+
+
 from agents.agent import Agent
 
 GRID_SIZE = 10
