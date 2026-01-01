@@ -1,21 +1,7 @@
 from agents.agent import Agent
-print("DEBUG Agent class:", Agent)
-print("DEBUG Agent module:", Agent.__module__)
-print("DEBUG has set_path:", hasattr(Agent, "set_path"))
-
-
-
-
-
-
-
-
-
-
-
-from agents.agent import Agent
 
 GRID_SIZE = 10
+
 
 def simple_path(start, goal):
     x, y = start
@@ -42,7 +28,9 @@ agents = [
 print("=== SIMULATION START ===")
 
 for agent in agents:
-    agent.set_path(simple_path(agent.start, agent.goal))
+    path = simple_path(agent.start, agent.goal)
+    agent.set_path(path)
+
     print(f"{agent.name} path: {agent.path}")
     print(f"{agent.name} final: {agent.final}")
 
