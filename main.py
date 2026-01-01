@@ -1,4 +1,5 @@
 from agents.agent import Agent
+import time
 
 GRID_SIZE = 10
 
@@ -24,22 +25,26 @@ agents = [
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
-print("=== SIMULATION START ===")
-
 for agent in agents:
-    agent.path = simple_path(agent.start, agent.goal)
-    agent.final = agent.path[-1]
-    print(f"{agent.name} path: {agent.path}")
-    print(f"{agent.name} final: {agent.final}")
+    agent.set_path(simple_path(agent.start, agent.goal))
 
-print("\nFINAL MAP VIEW:")
-final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+print("=== STEP-BY-STEP SIMULATION START ===")
 
-for agent in agents:
-    x, y = agent.final
-    final_map[y][x] = "L"
+max_steps = max(len(a.path) for a in agents)
 
-for row in final_map:
-    print(" ".join(row))
+for step in range(max_steps):
+    print(f"\n--- STEP {step} ---")
 
-print("=== SIMULATION END ===")
+    grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+
+    for agent in agents:
+        x, y = agent.move_step()
+        grid[y][x] = "L"
+        print(f"{agent.name} at {agent.position}")
+
+    for row in grid:
+        print(" ".join(row))
+
+    time.sleep(0.5)
+
+print("\n=== SIMULATION END ===")
