@@ -1,4 +1,19 @@
 from agents.agent import Agent
+print("DEBUG Agent class:", Agent)
+print("DEBUG Agent module:", Agent.__module__)
+print("DEBUG has set_path:", hasattr(Agent, "set_path"))
+
+
+
+
+
+
+
+
+
+
+
+from agents.agent import Agent
 
 GRID_SIZE = 10
 
