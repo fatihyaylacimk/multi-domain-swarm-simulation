@@ -1,4 +1,8 @@
 from agents.agent import Agent
+
+
+
+from agents.agent import Agent
 import time
 
 GRID_SIZE = 10
