@@ -7,7 +7,7 @@ agents = [
     Agent("LAND 1", (0, 0), (5, 5), "LAND"),
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
     Agent("LAND 3", (0, 5), (9, 9), "LAND"),
-    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),   # ✈️ AIR
+    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
 ]
 
 def simple_path(start, goal):
@@ -28,9 +28,11 @@ def simple_path(start, goal):
 # Path atama
 for agent in agents:
     if agent.type == "AIR":
-        agent.set_path(air_path(agent.start, agent.goal))
+        path = air_path(agent.start, agent.goal)
     else:
-        agent.set_path(simple_path(agent.start, agent.goal))
+        path = simple_path(agent.start, agent.goal)
+
+    agent.set_path(path)
 
 print("=== STEP-BY-STEP SIMULATION START ===")
 
