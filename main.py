@@ -1,29 +1,36 @@
 from agents.agent import Agent
 from algorithms.air_path import air_path
-from algorithms.prioritized_planning import prioritized_planning
 
 GRID_SIZE = 10
-
-obstacles = [
-    (3, 3), (3, 4), (3, 5),
-    (4, 5), (5, 5),
-]
 
 agents = [
     Agent("LAND 1", (0, 0), (5, 5), "LAND"),
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
     Agent("LAND 3", (0, 5), (9, 9), "LAND"),
-    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),   # ✈️
+    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),   # ✈️ AIR
 ]
 
-# LAND agents için prioritized planning
-land_agents = [a for a in agents if a.type == "LAND"]
-prioritized_planning(land_agents, GRID_SIZE, obstacles)
+def simple_path(start, goal):
+    x, y = start
+    gx, gy = goal
+    path = []
 
-# AIR agent için serbest yol
+    while x != gx:
+        x += 1 if gx > x else -1
+        path.append((x, y))
+
+    while y != gy:
+        y += 1 if gy > y else -1
+        path.append((x, y))
+
+    return path
+
+# Path atama
 for agent in agents:
     if agent.type == "AIR":
         agent.set_path(air_path(agent.start, agent.goal))
+    else:
+        agent.set_path(simple_path(agent.start, agent.goal))
 
 print("=== STEP-BY-STEP SIMULATION START ===")
 
@@ -46,12 +53,8 @@ while True:
 
     step += 1
 
-# FINAL MAP
 print("\nFINAL MAP VIEW:")
 grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
-
-for ox, oy in obstacles:
-    grid[oy][ox] = "#"
 
 for agent in agents:
     x, y = agent.position
