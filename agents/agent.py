@@ -1,22 +1,17 @@
 class Agent:
-    def __init__(self, name, start, goal):
+    def __init__(self, name, start, goal, agent_type="LAND"):
         self.name = name
         self.start = start
         self.goal = goal
+        self.type = agent_type   # LAND / AIR
         self.path = []
-        self.step_index = 0
         self.position = start
-        self.wait = False
+        self.step_index = 0
 
     def set_path(self, path):
         self.path = path
         self.step_index = 0
         self.position = self.start
-
-    def peek_next(self):
-        if self.step_index < len(self.path):
-            return self.path[self.step_index]
-        return None
 
     def move_step(self):
         if self.step_index < len(self.path):
