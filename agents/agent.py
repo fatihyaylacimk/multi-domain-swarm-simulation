@@ -3,7 +3,7 @@ class Agent:
         self.name = name
         self.start = start
         self.goal = goal
-        self.type = agent_type   # LAND / AIR
+        self.type = agent_type  # LAND veya AIR
         self.path = []
         self.position = start
         self.step_index = 0
