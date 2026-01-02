@@ -3,13 +3,6 @@ from algorithms.air_path import air_path
 
 GRID_SIZE = 10
 
-agents = [
-    Agent("LAND 1", (0, 0), (5, 5), "LAND"),
-    Agent("LAND 2", (1, 0), (1, 5), "LAND"),
-    Agent("LAND 3", (0, 5), (9, 9), "LAND"),
-    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
-]
-
 def simple_path(start, goal):
     x, y = start
     gx, gy = goal
@@ -25,7 +18,14 @@ def simple_path(start, goal):
 
     return path
 
-# Path atama
+agents = [
+    Agent("LAND 1", (0, 0), (5, 5), "LAND"),
+    Agent("LAND 2", (1, 0), (1, 5), "LAND"),
+    Agent("LAND 3", (0, 5), (9, 9), "LAND"),
+    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
+]
+
+# PATH ATAMA (EN ÖNEMLİ KISIM)
 for agent in agents:
     if agent.type == "AIR":
         path = air_path(agent.start, agent.goal)
