@@ -1,23 +1,13 @@
 from agents.agent import Agent
+from algorithms.astar import astar
 
 GRID_SIZE = 10
 
-def simple_path(start, goal):
-    x, y = start
-    gx, gy = goal
-    path = []
-
-    while x != gx:
-        path.append((x, y))
-        x += 1 if gx > x else -1
-
-    while y != gy:
-        path.append((x, y))
-        y += 1 if gy > y else -1
-
-    path.append((gx, gy))
-    return path
-
+# ENGELLER (istersen ekle)
+obstacles = [
+    (3, 3), (3, 4), (3, 5),
+    (4, 5), (5, 5),
+]
 
 agents = [
     Agent("LAND 1", (0, 0), (5, 5)),
@@ -25,8 +15,10 @@ agents = [
     Agent("LAND 3", (0, 5), (9, 9)),
 ]
 
+# A* ile path üret
 for agent in agents:
-    agent.set_path(simple_path(agent.start, agent.goal))
+    path = astar(agent.start, agent.goal, GRID_SIZE, obstacles)
+    agent.set_path(path)
 
 print("=== STEP-BY-STEP SIMULATION START ===")
 
@@ -37,20 +29,22 @@ while True:
     next_positions = {}
     active_agents = 0
 
-    # 1️⃣ ÇAKIŞMA KONTROLÜ
+    # ÇAKIŞMA KONTROLÜ
     for agent in agents:
         if agent.finished():
             continue
 
         active_agents += 1
-        next_pos = agent.peek_next()
+        nxt = agent.peek_next()
+        if nxt is None:
+            continue
 
-        if next_pos not in next_positions:
-            next_positions[next_pos] = agent
+        if nxt not in next_positions:
+            next_positions[nxt] = agent
         else:
             agent.wait = True
 
-    # 2️⃣ HAREKET
+    # HAREKET
     for agent in agents:
         if agent.finished():
             print(f"{agent.name} finished")
@@ -71,6 +65,8 @@ while True:
 # FINAL MAP
 print("\nFINAL MAP VIEW:")
 grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+for ox, oy in obstacles:
+    grid[oy][ox] = "#"
 
 for agent in agents:
     x, y = agent.position
