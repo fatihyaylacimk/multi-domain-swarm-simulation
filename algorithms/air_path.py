@@ -3,7 +3,7 @@ def air_path(start, goal):
     gx, gy = goal
     path = []
 
-    while (x, y) != (gx, gy):
+    while x != gx or y != gy:
         if x < gx:
             x += 1
         elif x > gx:
