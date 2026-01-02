@@ -1,14 +1,24 @@
 class Agent:
-    def __init__(self, name, start, goal):
+    def __init__(self, name, start, goal, agent_type="LAND"):
         self.name = name
         self.start = start
         self.goal = goal
+        self.type = agent_type
         self.path = []
-        self.final = None
+        self.position = start
+        self.step_index = 0
 
     def set_path(self, path):
         self.path = path
-        if path:
-            self.final = path[-1]
-        else:
-            self.final = None
+        self.step_index = 0
+        self.position = self.start
+
+    def move_step(self):
+        if self.step_index < len(self.path):
+            self.position = self.path[self.step_index]
+            self.step_index += 1
+            return self.position
+        return None
+
+    def finished(self):
+        return self.step_index >= len(self.path)
