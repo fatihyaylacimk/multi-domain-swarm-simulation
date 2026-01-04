@@ -3,21 +3,26 @@ from algorithms.air_path import air_path
 
 GRID_SIZE = 10
 
+
 def simple_path(start, goal):
     x, y = start
     gx, gy = goal
     path = []
 
+    # X yönü
     while x != gx:
         x += 1 if gx > x else -1
         path.append((x, y))
 
+    # Y yönü
     while y != gy:
         y += 1 if gy > y else -1
         path.append((x, y))
 
     return path
 
+
+# AGENT TANIMLARI
 agents = [
     Agent("LAND 1", (0, 0), (5, 5), "LAND"),
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
@@ -25,7 +30,12 @@ agents = [
     Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
 ]
 
-# PATH ATAMA (EN ÖNEMLİ KISIM)
+print("AGENTS LOADED:")
+for a in agents:
+    print(a.name, a.type)
+
+
+# PATH ATAMA
 for agent in agents:
     if agent.type == "AIR":
         path = air_path(agent.start, agent.goal)
@@ -34,7 +44,8 @@ for agent in agents:
 
     agent.set_path(path)
 
-print("=== STEP-BY-STEP SIMULATION START ===")
+
+print("\n=== STEP-BY-STEP SIMULATION START ===")
 
 step = 0
 while True:
@@ -54,6 +65,7 @@ while True:
         break
 
     step += 1
+
 
 print("\nFINAL MAP VIEW:")
 grid = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
