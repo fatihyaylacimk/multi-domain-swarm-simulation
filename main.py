@@ -18,7 +18,6 @@ def simple_path(start, goal):
     return path
 
 
-# === AGENTS ===
 agents = [
     Agent("LAND 1", (0, 0), (5, 5), "LAND"),
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
@@ -26,7 +25,6 @@ agents = [
     Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
 ]
 
-# LAND path setup
 for agent in agents:
     if agent.type == "LAND":
         agent.set_path(simple_path(agent.start, agent.goal))
@@ -36,10 +34,12 @@ print("=== STEP-BY-STEP SIMULATION START ===")
 step = 0
 while True:
     print(f"\n--- STEP {step} ---")
+
+    occupied = set(a.position for a in agents if not a.finished)
     active = False
 
     for agent in agents:
-        pos = agent.move_step()
+        pos = agent.move_step(occupied)
 
         if agent.finished:
             print(f"{agent.name} finished")
@@ -52,7 +52,7 @@ while True:
 
     step += 1
 
-# === FINAL MAP ===
+
 print("\nFINAL MAP VIEW:")
 final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
