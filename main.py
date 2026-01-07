@@ -23,11 +23,12 @@ agents = [
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
     Agent("LAND 3", (0, 5), (9, 9), "LAND"),
     Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
+    Agent("AIR 2",  (9, 9), (0, 0), "AIR"),
 ]
 
-for agent in agents:
-    if agent.type == "LAND":
-        agent.set_path(simple_path(agent.start, agent.goal))
+for a in agents:
+    if a.type == "LAND":
+        a.set_path(simple_path(a.start, a.goal))
 
 print("=== STEP-BY-STEP SIMULATION START ===")
 
@@ -36,10 +37,18 @@ while True:
     print(f"\n--- STEP {step} ---")
 
     occupied = set(a.position for a in agents if not a.finished)
-    active = False
 
+    # ---- AIR COMMUNICATION ----
+    air_agents = [a for a in agents if a.type == "AIR" and not a.finished]
+    air_plans = {}
+
+    for air in sorted(air_agents, key=lambda a: a.name):
+        plan = air.plan_next_air_move(occupied | set(air_plans.values()))
+        air_plans[air.name] = plan
+
+    active = False
     for agent in agents:
-        pos = agent.move_step(occupied)
+        pos = agent.move_step(occupied, air_plans)
 
         if agent.finished:
             print(f"{agent.name} finished")
@@ -56,9 +65,9 @@ while True:
 print("\nFINAL MAP VIEW:")
 final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
-for agent in agents:
-    x, y = agent.position
-    final_map[y][x] = "A" if agent.type == "AIR" else "L"
+for a in agents:
+    x, y = a.position
+    final_map[y][x] = "A" if a.type == "AIR" else "L"
 
 for row in final_map:
     print(" ".join(row))
