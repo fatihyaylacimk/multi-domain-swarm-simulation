@@ -1,72 +1,33 @@
-from environment.map import GridMap
 from agents.agent import Agent
-import time, os
 
-GRID = 10
+class Grid:
+    def __init__(self, w, h):
+        self.w, self.h = w, h
+    def in_bounds(self, x, y):
+        return 0 <= x < self.w and 0 <= y < self.h
 
-grid = GridMap(
-    GRID, GRID,
-    obstacles={(4,4),(4,5),(5,4)}
-)
+grid = Grid(10, 10)
 
-agents = [
-    Agent("LAND 1",(0,0),(5,5),"LAND"),
-    Agent("LAND 2",(1,0),(1,5),"LAND"),
-    Agent("AIR 1",(9,0),(0,9),"AIR"),
-    Agent("AIR 2",(9,9),(0,0),"AIR"),
-]
+# LAND'ler
+land1 = Agent("LAND 1", (0,0), (5,5), "LAND")
+land1.path = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(5,1),(5,2),(5,3),(5,4),(5,5)]
 
-SPEED = {"LAND":1, "AIR":2}
+# AIR Swarm
+air_leader = Agent("AIR L", (2,2), (9,9), "AIR_LEADER")
+air_follower = Agent("AIR F", (2,1), None, "AIR_FOLLOWER", leader=air_leader)
 
-print("=== SIMULATION START ===")
+agents = [land1, air_leader, air_follower]
 
-while True:
-    os.system("cls")
-    active = False
+# Leader planlasın
+air_leader.plan(grid, forbidden=set())
 
-    land_positions = set(a.position for a in agents if a.type=="LAND")
-
-    # AIR yeniden planlar
-    for a in agents:
-        if a.type=="AIR" and not a.finished:
-            a.plan(grid, land_positions)
-
-    # 🔮 AIR FUTURE COLLISION CHECK
-    air_future = {}
-    for a in agents:
-        if a.type=="AIR" and not a.finished:
-            air_future[a.name] = a.predict_next_positions(SPEED["AIR"])
-
-    # Çakışan AIR kareleri
-    blocked_air = set()
-    for name1, f1 in air_future.items():
-        for name2, f2 in air_future.items():
-            if name1 != name2:
-                blocked_air |= set(f1) & set(f2)
-
-    # Hareket
-    for a in agents:
-        for _ in range(SPEED[a.type]):
-            blocked = land_positions | blocked_air
-            a.move(blocked)
-        if not a.finished:
-            active = True
-
-    # Çizim
-    board = [["." for _ in range(GRID)] for _ in range(GRID)]
-    for o in grid.obstacles:
-        board[o[1]][o[0]] = "#"
+print("=== STEP-BY-STEP SIMULATION START ===")
+for step in range(15):
+    print(f"\n--- STEP {step} ---")
+    blocked = {a.position for a in agents}
 
     for a in agents:
-        x,y = a.position
-        board[y][x] = "A" if a.type=="AIR" else "L"
-
-    for r in board:
-        print(" ".join(r))
-
-    if not active:
-        break
-
-    time.sleep(0.5)
+        a.move(blocked, grid)
+        print(f"{a.name} at {a.position}")
 
 print("=== SIMULATION END ===")
