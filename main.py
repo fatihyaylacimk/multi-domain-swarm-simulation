@@ -2,6 +2,10 @@ from agents.agent import Agent
 
 GRID_SIZE = 10
 
+
+# --------------------
+# LAND PATH (4 yön)
+# --------------------
 def simple_path(start, goal):
     x, y = start
     gx, gy = goal
@@ -13,6 +17,30 @@ def simple_path(start, goal):
 
     while y != gy:
         y += 1 if gy > y else -1
+        path.append((x, y))
+
+    return path
+
+
+# --------------------
+# AIR PATH (2D SERBEST – ÇAPRAZ)
+# --------------------
+def air_free_path(start, goal):
+    x, y = start
+    gx, gy = goal
+    path = [(x, y)]
+
+    while (x, y) != (gx, gy):
+        if x < gx:
+            x += 1
+        elif x > gx:
+            x -= 1
+
+        if y < gy:
+            y += 1
+        elif y > gy:
+            y -= 1
+
         path.append((x, y))
 
     return path
@@ -37,10 +65,16 @@ air_follower = Agent(
 
 agents = [land1, land2, land3, air_leader, air_follower]
 
+
+# --------------------
 # PATH ATAMA
+# --------------------
 for a in agents:
     if a.goal:
-        a.set_path(simple_path(a.start, a.goal))
+        if "AIR" in a.type:
+            a.set_path(air_free_path(a.start, a.goal))
+        else:
+            a.set_path(simple_path(a.start, a.goal))
 
 
 # --------------------
