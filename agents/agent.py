@@ -10,30 +10,36 @@ class Agent:
         self.position = start
         self.finished = False
 
-    # LAND agents için
+    # LAND agents
     def set_path(self, path):
         self.path = path
         self.step_index = 0
         self.position = path[0]
 
-    # AIR agent için – akıllı 2D hareket
-    def move_step(self):
+    # Hareket (collision-aware)
+    def move_step(self, occupied_positions=None):
         if self.finished:
             return None
 
-        # LAND agent
+        if occupied_positions is None:
+            occupied_positions = set()
+
+        # ---------- LAND ----------
         if self.type == "LAND":
             if self.step_index < len(self.path):
-                self.position = self.path[self.step_index]
+                next_pos = self.path[self.step_index]
                 self.step_index += 1
+                self.position = next_pos
+
                 if self.position == self.goal:
                     self.finished = True
+
                 return self.position
             else:
                 self.finished = True
                 return None
 
-        # AIR agent (serbest 2D akıllı hareket)
+        # ---------- AIR (AKILLI) ----------
         if self.type == "AIR":
             x, y = self.position
             gx, gy = self.goal
@@ -42,15 +48,25 @@ class Agent:
                 self.finished = True
                 return None
 
-            if x < gx:
-                x += 1
-            elif x > gx:
-                x -= 1
+            # Olası hareketler (8 yön – serbest uçuş)
+            candidates = [
+                (x + 1, y), (x - 1, y),
+                (x, y + 1), (x, y - 1),
+                (x + 1, y + 1), (x - 1, y - 1),
+                (x + 1, y - 1), (x - 1, y + 1),
+            ]
 
-            if y < gy:
-                y += 1
-            elif y > gy:
-                y -= 1
+            # Hedefe yakınlığa göre sırala
+            candidates.sort(
+                key=lambda p: abs(p[0] - gx) + abs(p[1] - gy)
+            )
 
-            self.position = (x, y)
+            # Çakışmayan ilk hücreyi seç
+            for nx, ny in candidates:
+                if 0 <= nx < 10 and 0 <= ny < 10:
+                    if (nx, ny) not in occupied_positions:
+                        self.position = (nx, ny)
+                        return self.position
+
+            # Hiç yer yoksa bekle
             return self.position
