@@ -1,10 +1,11 @@
 from agents.agent import Agent
+import heapq
 
 GRID_SIZE = 10
 
 
 # --------------------
-# LAND PATH (4 yön)
+# LAND PATH (BASİT – 4 YÖN)
 # --------------------
 def simple_path(start, goal):
     x, y = start
@@ -23,27 +24,46 @@ def simple_path(start, goal):
 
 
 # --------------------
-# AIR PATH (2D SERBEST – ÇAPRAZ)
+# AIR A* (8 YÖN – AKILLI)
 # --------------------
-def air_free_path(start, goal):
-    x, y = start
-    gx, gy = goal
-    path = [(x, y)]
+def air_astar(start, goal, grid_size):
+    def heuristic(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-    while (x, y) != (gx, gy):
-        if x < gx:
-            x += 1
-        elif x > gx:
-            x -= 1
+    directions = [
+        (1, 0), (-1, 0), (0, 1), (0, -1),
+        (1, 1), (1, -1), (-1, 1), (-1, -1)
+    ]
 
-        if y < gy:
-            y += 1
-        elif y > gy:
-            y -= 1
+    open_set = []
+    heapq.heappush(open_set, (0, start))
 
-        path.append((x, y))
+    came_from = {}
+    g_score = {start: 0}
 
-    return path
+    while open_set:
+        _, current = heapq.heappop(open_set)
+
+        if current == goal:
+            path = [current]
+            while current in came_from:
+                current = came_from[current]
+                path.append(current)
+            return path[::-1]
+
+        for dx, dy in directions:
+            nx, ny = current[0] + dx, current[1] + dy
+            if 0 <= nx < grid_size and 0 <= ny < grid_size:
+                neighbor = (nx, ny)
+                tentative_g = g_score[current] + 1
+
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f = tentative_g + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f, neighbor))
+
+    return []
 
 
 # --------------------
@@ -72,13 +92,13 @@ agents = [land1, land2, land3, air_leader, air_follower]
 for a in agents:
     if a.goal:
         if "AIR" in a.type:
-            a.set_path(air_free_path(a.start, a.goal))
+            a.set_path(air_astar(a.start, a.goal, GRID_SIZE))
         else:
             a.set_path(simple_path(a.start, a.goal))
 
 
 # --------------------
-# SIMULATION
+# SIMULATION (STEP-BY-STEP)
 # --------------------
 print("=== STEP-BY-STEP SIMULATION START ===")
 
@@ -88,7 +108,6 @@ while True:
 
     occupied = set(a.position for a in agents if not a.finished)
     reserved = set()
-
     all_finished = True
 
     for agent in agents:
