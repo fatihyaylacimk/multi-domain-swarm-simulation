@@ -10,63 +10,62 @@ class Agent:
         self.position = start
         self.finished = False
 
-    # LAND agents
     def set_path(self, path):
         self.path = path
         self.step_index = 0
         self.position = path[0]
 
-    # Hareket (collision-aware)
-    def move_step(self, occupied_positions=None):
+    def plan_next_air_move(self, occupied):
+        x, y = self.position
+        gx, gy = self.goal
+
+        candidates = [
+            (x + 1, y), (x - 1, y),
+            (x, y + 1), (x, y - 1),
+            (x + 1, y + 1), (x - 1, y - 1),
+            (x + 1, y - 1), (x - 1, y + 1),
+        ]
+
+        candidates = [
+            p for p in candidates
+            if 0 <= p[0] < 10 and 0 <= p[1] < 10
+        ]
+
+        candidates.sort(
+            key=lambda p: abs(p[0] - gx) + abs(p[1] - gy)
+        )
+
+        for c in candidates:
+            if c not in occupied:
+                return c
+
+        return self.position  # bekle
+
+    def move_step(self, occupied_positions=None, air_plans=None):
         if self.finished:
             return None
 
         if occupied_positions is None:
             occupied_positions = set()
 
-        # ---------- LAND ----------
+        # -------- LAND --------
         if self.type == "LAND":
             if self.step_index < len(self.path):
-                next_pos = self.path[self.step_index]
+                self.position = self.path[self.step_index]
                 self.step_index += 1
-                self.position = next_pos
-
                 if self.position == self.goal:
                     self.finished = True
-
                 return self.position
             else:
                 self.finished = True
                 return None
 
-        # ---------- AIR (AKILLI) ----------
+        # -------- AIR --------
         if self.type == "AIR":
-            x, y = self.position
-            gx, gy = self.goal
-
-            if (x, y) == (gx, gy):
+            if self.position == self.goal:
                 self.finished = True
                 return None
 
-            # Olası hareketler (8 yön – serbest uçuş)
-            candidates = [
-                (x + 1, y), (x - 1, y),
-                (x, y + 1), (x, y - 1),
-                (x + 1, y + 1), (x - 1, y - 1),
-                (x + 1, y - 1), (x - 1, y + 1),
-            ]
-
-            # Hedefe yakınlığa göre sırala
-            candidates.sort(
-                key=lambda p: abs(p[0] - gx) + abs(p[1] - gy)
-            )
-
-            # Çakışmayan ilk hücreyi seç
-            for nx, ny in candidates:
-                if 0 <= nx < 10 and 0 <= ny < 10:
-                    if (nx, ny) not in occupied_positions:
-                        self.position = (nx, ny)
-                        return self.position
-
-            # Hiç yer yoksa bekle
+            next_pos = air_plans.get(self.name, self.position)
+            self.position = next_pos
             return self.position
