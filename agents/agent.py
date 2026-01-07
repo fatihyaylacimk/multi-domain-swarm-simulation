@@ -3,18 +3,22 @@ class Agent:
         self.name = name
         self.start = start
         self.goal = goal
-        self.type = agent_type      # "LAND", "AIR_LEADER", "AIR_FOLLOWER"
+        self.type = agent_type          # "LAND", "AIR_LEADER", "AIR_FOLLOWER"
         self.leader = leader
+
         self.position = start
         self.path = []
         self.step = 0
         self.finished = False
 
+        # 🔴 AIR özellikleri
+        self.can_fly = self.type.startswith("AIR")
+        self.speed = 2 if self.can_fly else 1   # 🔴 HIZ FARKI
+
     def manhattan(self, p):
         return abs(p[0]-self.goal[0]) + abs(p[1]-self.goal[1])
 
     def plan(self, grid, forbidden):
-        # Leader planlar
         if self.type != "AIR_LEADER":
             return
 
@@ -29,10 +33,11 @@ class Agent:
             if y != gy:
                 candidates.append((x, y + (1 if gy > y else -1)))
 
-            candidates = [
-                p for p in candidates
-                if grid.in_bounds(*p) and p not in forbidden
-            ]
+            # AIR engel umursamaz
+            if not self.can_fly:
+                candidates = [p for p in candidates if p not in forbidden]
+
+            candidates = [p for p in candidates if grid.in_bounds(*p)]
             if not candidates:
                 break
 
@@ -42,43 +47,30 @@ class Agent:
 
         self.step = 0
 
-    def predict_next_positions(self, steps):
-        return self.path[self.step:self.step+steps]
-
     def move(self, blocked, grid):
         if self.finished:
             return
 
-        # FOLLOWER: liderin önceki konumunu takip et
-        if self.type == "AIR_FOLLOWER":
-            if self.leader:
-                target = self.leader.position
-                if target not in blocked:
-                    self.position = target
+        # FOLLOWER: lideri kopyala
+        if self.type == "AIR_FOLLOWER" and self.leader:
+            self.position = self.leader.position
             return
 
-        # LEADER / LAND
-        if self.step >= len(self.path):
-            self.finished = True
-            return
+        # 🔴 HIZ KULLANIMI
+        for _ in range(self.speed):
+            if self.step >= len(self.path):
+                self.finished = True
+                return
 
-        next_pos = self.path[self.step]
+            next_pos = self.path[self.step]
 
-        # Alternatif dene (AIR zekâsı)
-        if self.type.startswith("AIR") and next_pos in blocked:
-            x, y = self.position
-            neighbors = [(x+1,y),(x-1,y),(x,y+1),(x,y-1)]
-            neighbors = [
-                p for p in neighbors
-                if grid.in_bounds(*p) and p not in blocked
-            ]
-            if neighbors:
-                next_pos = min(neighbors, key=self.manhattan)
-            else:
-                return  # bekle
+            # LAND çarpışma, AIR uçabilir
+            if not self.can_fly and next_pos in blocked:
+                return
 
-        self.position = next_pos
-        self.step += 1
+            self.position = next_pos
+            self.step += 1
 
-        if self.position == self.goal:
-            self.finished = True
+            if self.goal and self.position == self.goal:
+                self.finished = True
+                return
