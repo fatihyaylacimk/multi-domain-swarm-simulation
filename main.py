@@ -17,6 +17,12 @@ agents = [
     Agent("AIR 2",(9,9),(0,0),"AIR"),
 ]
 
+# HIZ TANIMI
+SPEED = {
+    "LAND": 1,
+    "AIR": 2
+}
+
 for a in agents:
     if a.type == "AIR":
         a.plan(grid, set())
@@ -27,18 +33,22 @@ while True:
     os.system("cls")
     active = False
 
+    # LAND konumları AIR için engel
     forbidden = set(a.position for a in agents if a.type=="LAND")
 
     for a in agents:
         if a.type == "AIR" and not a.finished:
             a.plan(grid, forbidden)
 
+    # 🔥 HIZ FARKI BURADA
     for a in agents:
-        a.move()
+        for _ in range(SPEED[a.type]):
+            a.move()
+
         if not a.finished:
             active = True
 
-    # DRAW
+    # ÇİZİM
     board = [["." for _ in range(GRID)] for _ in range(GRID)]
     for o in grid.obstacles:
         board[o[1]][o[0]] = "#"
