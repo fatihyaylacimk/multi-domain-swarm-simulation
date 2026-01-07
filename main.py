@@ -1,7 +1,6 @@
 from environment.map import GridMap
 from agents.agent import Agent
-import time
-import os
+import time, os
 
 GRID = 10
 
@@ -17,15 +16,7 @@ agents = [
     Agent("AIR 2",(9,9),(0,0),"AIR"),
 ]
 
-# HIZ TANIMI
-SPEED = {
-    "LAND": 1,
-    "AIR": 2
-}
-
-for a in agents:
-    if a.type == "AIR":
-        a.plan(grid, set())
+SPEED = {"LAND":1, "AIR":2}
 
 print("=== SIMULATION START ===")
 
@@ -33,22 +24,35 @@ while True:
     os.system("cls")
     active = False
 
-    # LAND konumları AIR için engel
-    forbidden = set(a.position for a in agents if a.type=="LAND")
+    land_positions = set(a.position for a in agents if a.type=="LAND")
 
+    # AIR yeniden planlar
     for a in agents:
-        if a.type == "AIR" and not a.finished:
-            a.plan(grid, forbidden)
+        if a.type=="AIR" and not a.finished:
+            a.plan(grid, land_positions)
 
-    # 🔥 HIZ FARKI BURADA
+    # 🔮 AIR FUTURE COLLISION CHECK
+    air_future = {}
+    for a in agents:
+        if a.type=="AIR" and not a.finished:
+            air_future[a.name] = a.predict_next_positions(SPEED["AIR"])
+
+    # Çakışan AIR kareleri
+    blocked_air = set()
+    for name1, f1 in air_future.items():
+        for name2, f2 in air_future.items():
+            if name1 != name2:
+                blocked_air |= set(f1) & set(f2)
+
+    # Hareket
     for a in agents:
         for _ in range(SPEED[a.type]):
-            a.move()
-
+            blocked = land_positions | blocked_air
+            a.move(blocked)
         if not a.finished:
             active = True
 
-    # ÇİZİM
+    # Çizim
     board = [["." for _ in range(GRID)] for _ in range(GRID)]
     for o in grid.obstacles:
         board[o[1]][o[0]] = "#"
