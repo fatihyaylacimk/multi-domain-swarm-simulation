@@ -2,8 +2,7 @@ from agents.agent import Agent
 
 GRID_SIZE = 10
 
-
-def simple_land_path(start, goal):
+def simple_path(start, goal):
     x, y = start
     gx, gy = goal
     path = [(x, y)]
@@ -19,57 +18,42 @@ def simple_land_path(start, goal):
     return path
 
 
-def simple_air_path(start, goal):
-    x, y = start
-    gx, gy = goal
-    path = [(x, y)]
-
-    while x != gx or y != gy:
-        if x != gx:
-            x += 1 if gx > x else -1
-        if y != gy:
-            y += 1 if gy > y else -1
-        path.append((x, y))
-
-    return path
-
-
+# === AGENTS ===
 agents = [
     Agent("LAND 1", (0, 0), (5, 5), "LAND"),
     Agent("LAND 2", (1, 0), (1, 5), "LAND"),
     Agent("LAND 3", (0, 5), (9, 9), "LAND"),
-    Agent("AIR 1", (9, 0), (0, 9), "AIR"),
+    Agent("AIR 1",  (9, 0), (0, 9), "AIR"),
 ]
 
+# LAND path setup
 for agent in agents:
     if agent.type == "LAND":
-        agent.set_path(simple_land_path(agent.start, agent.goal))
-    else:
-        agent.set_path(simple_air_path(agent.start, agent.goal))
+        agent.set_path(simple_path(agent.start, agent.goal))
 
-
-print("=== STEP-BY-STEP SIMULATION START ===\n")
+print("=== STEP-BY-STEP SIMULATION START ===")
 
 step = 0
-running = True
-
-while running:
-    print(f"--- STEP {step} ---")
-    running = False
+while True:
+    print(f"\n--- STEP {step} ---")
+    active = False
 
     for agent in agents:
-        if not agent.finished():
-            agent.move_step()
-            print(f"{agent.name} at {agent.position}")
-            running = True
-        else:
-            print(f"{agent.name} finished")
+        pos = agent.move_step()
 
-    print()
+        if agent.finished:
+            print(f"{agent.name} finished")
+        else:
+            print(f"{agent.name} at {agent.position}")
+            active = True
+
+    if not active:
+        break
+
     step += 1
 
-
-print("FINAL MAP VIEW:")
+# === FINAL MAP ===
+print("\nFINAL MAP VIEW:")
 final_map = [["." for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
 
 for agent in agents:
